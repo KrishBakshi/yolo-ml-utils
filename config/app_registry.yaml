@@ -1,0 +1,8 @@
+# APPS
+- name: Home
+  id: home
+  type: builtin
+
+- name: Image Data Plot
+  id: image_data_plot
+  import_path: src.image_data_plot.app
