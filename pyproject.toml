@@ -1,0 +1,12 @@
+[project]
+name = "ml-utils"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "gradio>=6.1.0",
+    "matplotlib>=3.10.8",
+    "opencv-python>=4.12.0.88",
+    "pymupdf>=1.26.7",
+]
