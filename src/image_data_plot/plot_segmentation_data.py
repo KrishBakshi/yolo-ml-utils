@@ -141,46 +141,67 @@ def create_segmentation_visualization(
     return output_path
 
 
-def process_yolo_zip(zip_file, alpha=0.3, show_polygons=True, segmentation_type="Semantic", progress=gr.Progress(track_tqdm=True)):
+def process_segmentation_zip(zip_file, input_path, alpha=0.3, show_polygons=True, segmentation_type="Semantic", progress=gr.Progress(track_tqdm=True)):
     """Process YOLO zip file and return results"""
-    if zip_file is None:
-        return [], "Error: Please upload a ZIP file", None
+    if zip_file is None and (input_path is None or input_path.strip() == ""):
+        return [], "Error: Please provide either a ZIP file or a directory path", None
     
     # Create temporary directory for extraction
-    extract_dir = tempfile.mkdtemp()
+    extract_dir = None
     temp_dir = tempfile.mkdtemp()  # For output plots
-    
+    is_zip = zip_file is not None
+
     try:
-        # Extract ZIP file
-        with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-            zip_ref.extractall(extract_dir)
+        if is_zip:
+            # Handle ZIP file
+            extract_dir = tempfile.mkdtemp()
+            with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+                zip_ref.extractall(extract_dir)
+            images_dir = os.path.join(extract_dir, "images")
+            labels_dir = os.path.join(extract_dir, "labels")
+        else:
+            # Handle directory path
+            input_path = input_path.strip()
+            if not os.path.exists(input_path):
+                shutil.rmtree(temp_dir)
+                return [], f"Error: Path does not exist: {input_path}", None
+            if not os.path.isdir(input_path):
+                shutil.rmtree(temp_dir)
+                return [], f"Error: Path is not a directory: {input_path}", None
+            images_dir = os.path.join(input_path, "images")
+            labels_dir = os.path.join(input_path, "labels")
+        
+        if not os.path.exists(images_dir):
+            if extract_dir:
+                shutil.rmtree(extract_dir)
+            shutil.rmtree(temp_dir)
+            input_type = "ZIP file" if is_zip else "directory"
+            return [], f"Error: 'images' directory not found in {input_type}", None
+        if not os.path.exists(labels_dir):
+            if extract_dir:
+                shutil.rmtree(extract_dir)
+            shutil.rmtree(temp_dir)
+            input_type = "ZIP file" if is_zip else "directory"
+            return [], f"Error: 'labels' directory not found in {input_type}", None
         
         # Look for classes.txt in the extracted directory
-        classes_file = os.path.join(extract_dir, "classes.txt")
+        if is_zip:
+            classes_file = os.path.join(extract_dir, "classes.txt")
+        else:
+            classes_file = os.path.join(input_path, "classes.txt")
+
         class_names = None
         if os.path.exists(classes_file):
             with open(classes_file, 'r') as f:
                 class_names = [line.strip() for line in f.readlines()]
-        
-        # Get images and labels directories
-        images_dir = os.path.join(extract_dir, "images")
-        labels_dir = os.path.join(extract_dir, "labels")
-        
-        if not os.path.exists(images_dir):
-            shutil.rmtree(extract_dir)
-            shutil.rmtree(temp_dir)
-            return [], f"Error: 'images' directory not found in ZIP file", None
-        if not os.path.exists(labels_dir):
-            shutil.rmtree(extract_dir)
-            shutil.rmtree(temp_dir)
-            return [], f"Error: 'labels' directory not found in ZIP file", None
         
         # Get image files
         image_files = list(Path(images_dir).glob("*.png")) + list(Path(images_dir).glob("*.jpg")) + \
                      list(Path(images_dir).glob("*.jpeg")) + list(Path(images_dir).glob("*.JPG"))
         
         if not image_files:
-            shutil.rmtree(extract_dir)
+            if extract_dir:
+                shutil.rmtree(extract_dir)
             shutil.rmtree(temp_dir)
             return [], f"Error: No image files found in images directory", None
         
@@ -214,7 +235,8 @@ def process_yolo_zip(zip_file, alpha=0.3, show_polygons=True, segmentation_type=
                 continue
         
         if not output_paths:
-            shutil.rmtree(extract_dir)
+            if extract_dir:
+                shutil.rmtree(extract_dir)
             shutil.rmtree(temp_dir)
             return [], f"Error: Failed to process any images", None
         
@@ -224,13 +246,17 @@ def process_yolo_zip(zip_file, alpha=0.3, show_polygons=True, segmentation_type=
             for plot_path in output_paths:
                 zipf.write(plot_path, os.path.basename(plot_path))
         
-        # Clean up extracted directory
-        shutil.rmtree(extract_dir)
+        # Clean up extracted directory if it was a ZIP
+        if extract_dir:
+            shutil.rmtree(extract_dir)
         
         # Generate status message
         status_msg = "\n".join(progress_lines) + "\n\n"
-        status_msg += f"Successfully processed ZIP file!\n\n"
-        status_msg += f"ZIP file: {Path(zip_file).name}\n"
+        status_msg += f"Successfully processed {'ZIP file' if is_zip else 'directory'}!\n\n"
+        if is_zip:
+            status_msg += f"ZIP file: {Path(zip_file).name}\n"
+        else:
+            status_msg += f"Directory: {input_path}\n"
         status_msg += f"Found {len(image_files)} image(s)\n"
         status_msg += f"Processed {len(processed_images)} image(s) successfully\n"
         status_msg += f"Processed images: {', '.join(processed_images[:10])}"  # Show first 10
@@ -243,14 +269,15 @@ def process_yolo_zip(zip_file, alpha=0.3, show_polygons=True, segmentation_type=
         return output_paths, status_msg, zip_path
         
     except zipfile.BadZipFile:
-        if os.path.exists(extract_dir):
+        if extract_dir and os.path.exists(extract_dir):
             shutil.rmtree(extract_dir)
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
         return [], "Error: Invalid ZIP file format", None
     except Exception as e:
-        if os.path.exists(extract_dir):
+        if extract_dir and os.path.exists(extract_dir):
             shutil.rmtree(extract_dir)
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
-        return [], f"Error processing ZIP file: {str(e)}", None
+        input_type = "ZIP file" if is_zip else "directory"
+        return [], f"Error processing {input_type}: {str(e)}", None
