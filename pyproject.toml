@@ -9,4 +9,5 @@ dependencies = [
     "matplotlib>=3.10.8",
     "opencv-python>=4.12.0.88",
     "pymupdf>=1.26.7",
+    "split-folders>=0.5.1",
 ]

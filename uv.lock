@@ -719,6 +719,7 @@ dependencies = [
     { name = "matplotlib" },
     { name = "opencv-python" },
     { name = "pymupdf" },
+    { name = "split-folders" },
 ]
 
 [package.metadata]
@@ -727,6 +728,7 @@ requires-dist = [
     { name = "matplotlib", specifier = ">=3.10.8" },
     { name = "opencv-python", specifier = ">=4.12.0.88" },
     { name = "pymupdf", specifier = ">=1.26.7" },
+    { name = "split-folders", specifier = ">=0.5.1" },
 ]
 
 [[package]]
@@ -1216,6 +1218,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
+]
+
+[[package]]
+name = "split-folders"
+version = "0.5.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a7/4c/32d2d49b82ea5baf0ff1a55de88c7fb8a0bf2aab02763c8501b2a51bf55f/split_folders-0.5.1.tar.gz", hash = "sha256:7127a226b90e00fa86cda4451fe015c6f3755bc3d627064adb9c5209fc8280f6", size = 7949, upload-time = "2022-02-03T21:56:10.398Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b6/d5/307d63c03356bad6e141d8718d3f4116f51bd9c4b09e2614ffcee1f3c6fd/split_folders-0.5.1-py3-none-any.whl", hash = "sha256:cb010e00f34d247b8e8bbfd6cfe527f871361d8524ed54734924e7efd261801f", size = 8388, upload-time = "2022-02-03T21:56:09.072Z" },
 ]
 
 [[package]]
