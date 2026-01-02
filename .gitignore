@@ -8,3 +8,13 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Data
+temp/
+
+*.pt
+*.pth
+
+runs/
+
+*.DS_Store
