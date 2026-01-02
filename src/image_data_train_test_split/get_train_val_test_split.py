@@ -138,10 +138,7 @@ def split_train_val_test(zip_file, input_path, train_ratio=0.7, val_ratio=0.2, t
         # Copy classes.txt if exists
         classes_file = os.path.join(source_dir, "classes.txt")
         if os.path.exists(classes_file):
-            for split_name in split_names:
-                split_dir = os.path.join(output_dir, split_name)
-                if os.path.exists(split_dir):
-                    shutil.copy2(classes_file, os.path.join(split_dir, "classes.txt"))
+            shutil.copy2(classes_file, os.path.join(output_dir, "classes.txt"))
         
         # Cleanup
         if extract_dir:
