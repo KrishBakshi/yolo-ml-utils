@@ -2,7 +2,7 @@
 
 A collection of machine learning utilities and visualization tools built with [Gradio](https://gradio.app/). Designed to streamline common ML/CV workflows, especially for YOLO-based object detection and segmentation tasks.
 
-**Author:** [Krish Bakshi](https://www.krishb.tech)
+**Author:** [Krish Bakshi](https://www.krishbakshi.com)
 
 ---
 
